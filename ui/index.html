@@ -1,0 +1,52 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>PowerEdit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <aside class="pe-shell">
+        <header class="pe-header">
+            <div class="pe-title">⚡ PowerEdit</div>
+            <div class="pe-actions">
+                <button id="togglePin" class="icon-btn" title="Pin panel">📌</button>
+            </div>
+        </header>
+
+        <section class="pe-card">
+            <label class="pe-label">Load a DOCX file</label>
+            <div class="pe-row">
+                <button id="browse" class="pe-btn pe-btn-primary">Browse…</button>
+                <span id="fileName" class="pe-muted">No file selected</span>
+            </div>
+            <div class="pe-hint">File opens in the editor (center). Panel stays pinned.</div>
+        </section>
+
+        <section class="pe-card">
+            <label class="pe-label">Select Action</label>
+            <div class="pe-row">
+                <select id="action" class="pe-input">
+                    <option value="">— Choose an action —</option>
+                    <option value="punctuation">1 — Punctuation shift</option>
+                    <option value="query">2 — Query inserted</option>
+                    <option value="doi">3 — DOI validation</option>
+                    <option value="url">4 — URL validation</option>
+                    <option value="preedit">5 — PreEditing</option>
+                    <option value="custom6">6 — Custom (reserved)</option>
+                </select>
+                <button id="run" class="pe-btn" disabled>Run</button>
+            </div>
+        </section>
+
+        <section class="pe-status pe-card" id="statusCard">
+            <div id="status">Ready.</div>
+        </section>
+    </aside>
+
+    <div id="toast" class="pe-toast" hidden></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

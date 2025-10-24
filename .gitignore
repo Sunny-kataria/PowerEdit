@@ -1,0 +1,24 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build outputs
+bin/
+obj/
+Debug/
+Release/
+
+# Office Addin cache
+*.pdb
+*.cache
+.vsto/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Other misc
+~$*
+*.log
+*.tmp
