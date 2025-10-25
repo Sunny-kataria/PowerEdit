@@ -7,6 +7,10 @@ using System.IO;
 using System.Threading.Tasks;
 using Office = Microsoft.Office.Core;
 using Word = Microsoft.Office.Interop.Word;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+
 
 
 namespace PowerEditAddIn
@@ -80,19 +84,25 @@ namespace PowerEditAddIn
 
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        // Get current open document
-                        var activeDoc = this.Application.ActiveDocument;
+                        var app = this.Application;
 
-                        // Clear existing content if needed
-                        activeDoc.Content.Delete();
+                        // 1) Close current active doc WITHOUT SAVE silently
+                        try
+                        {
+                            if (app.Documents.Count > 0)
+                            {
+                                app.ActiveDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
+                            }
+                        }
+                        catch { }
 
-                        // Insert file INTO current document
-                        activeDoc.Range(0, 0).InsertFile(dlg.FileName);
+                        // 2) Open selected file in SAME Word instance
+                        var doc = app.Documents.Open(dlg.FileName, ReadOnly: false, Visible: true);
 
-                        // Keep pane visible
+                        // 3) Re-show pane because sometimes Word hides it on file open
                         _pane.Visible = true;
 
-                        NotifyClient("Loaded into same document: " + Path.GetFileName(dlg.FileName));
+                        NotifyClient("Opened: " + Path.GetFileName(dlg.FileName));
                     }
                 }
             }
@@ -103,12 +113,43 @@ namespace PowerEditAddIn
         }
 
 
-
         public void RunSelectedAction(string key)
         {
-            // Abhi ke liye sirf testing ke liye
-            NotifyClient("Action selected: " + key);
+            try
+            {
+                switch (key)
+                {
+                    case "punctuation":
+                        Action_PunctuationShift();   // ✅ yeh line add
+                        break;
+
+                    case "query":
+                        NotifyClient("Query inserted (demo).");
+                        break;
+
+                    case "doi":
+                        NotifyClient("DOI validation (demo).");
+                        break;
+
+                    case "url":
+                        NotifyClient("URL validation (demo).");
+                        break;
+
+                    case "preedit":
+                        NotifyClient("PreEditing (demo).");
+                        break;
+
+                    default:
+                        NotifyClient("Action not implemented: " + key);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                NotifyClient("Action failed: " + ex.Message);
+            }
         }
+
 
 
         public void InsertTextIntoWord(string text)
@@ -136,5 +177,163 @@ namespace PowerEditAddIn
             this.Startup += new System.EventHandler(ThisAddIn_Startup);
             this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
         }
+        private void Action_PunctuationShift()
+        {
+            var app = this.Application;
+            Word.Document doc = null;
+
+            try
+            {
+                doc = app.ActiveDocument;
+                if (doc == null)
+                {
+                    NotifyClient("No active document.");
+                    return;
+                }
+
+                // (optional) UI smoother
+                bool oldScreenUpdating = app.ScreenUpdating;
+                app.ScreenUpdating = false;
+
+                int moveCount = 0, skippedSuper = 0, nonNumericSkipped = 0, spaceFixCount = 0;
+                var modifiedBrackets = new List<int>();
+
+                foreach (Word.Hyperlink link in doc.Hyperlinks)
+                {
+                    try
+                    {
+                        string sub = link.SubAddress;
+                        if (string.IsNullOrEmpty(sub) ||
+                            !sub.StartsWith("bib", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        Word.Range range = link.Range;
+                        string linkText = range.Text.Trim();
+
+                        // ---- FILTERS (ONLY_HYPERLINKS) ----
+                        // Must begin with a digit (optionally [ or ()
+                        if (!Regex.IsMatch(linkText, @"^\s*[\[\(]?\s*\d"))
+                        { nonNumericSkipped++; continue; }
+
+                        // Skip if contains any letter
+                        if (Regex.IsMatch(linkText, @"[A-Za-z]"))
+                        { nonNumericSkipped++; continue; }
+
+                        // Skip if looks like a year (1900–2099)
+                        if (Regex.IsMatch(linkText, @"\b(19|20)\d{2}\b"))
+                        { nonNumericSkipped++; continue; }
+
+                        // Skip superscript hyperlinks
+                        bool isSuper = false;
+                        for (int i = range.Start; i < range.End; i++)
+                        {
+                            Word.Range ch = doc.Range(i, i + 1);
+                            if (ch.Font.Superscript == -1) { isSuper = true; }
+                            Marshal.ReleaseComObject(ch);
+                            if (isSuper) break;
+                        }
+                        if (isSuper) { skippedSuper++; continue; }
+
+                        // ---- FIND OPENING BRACKET BEFORE CITATION ----
+                        int bracketPos = -1;
+                        for (int i = range.Start - 1; i >= Math.Max(0, range.Start - 200); i--)
+                        {
+                            string t = doc.Range(i, i + 1).Text;
+                            if (t == "(" || t == "[") { bracketPos = i; break; }
+                            if (t == "\r" || t == "\n") break;
+                        }
+                        if (bracketPos == -1) continue;
+
+                        // ---- FIND PUNCTUATION JUST BEFORE BRACKET ----
+                        int punctPos = -1;
+                        char[] marks = { '.', ',', ';', ':', '!', '?' };
+                        for (int j = bracketPos - 1; j >= Math.Max(0, bracketPos - 10); j--)
+                        {
+                            string c = doc.Range(j, j + 1).Text;
+                            if (string.IsNullOrWhiteSpace(c)) continue;
+                            if (Array.Exists(marks, p => p.ToString() == c)) { punctPos = j; break; }
+                            else break;
+                        }
+                        if (punctPos == -1) continue;
+
+                        string punc = doc.Range(punctPos, punctPos + 1).Text;
+                        doc.Range(punctPos, punctPos + 1).Delete();
+
+                        // ---- FIND CLOSING BRACKET AFTER CITATION ----
+                        int closePos = -1;
+                        for (int k = range.End; k < Math.Min(doc.Content.End, range.End + 200); k++)
+                        {
+                            string c = doc.Range(k, k + 1).Text;
+                            if (c == ")" || c == "]") { closePos = k; break; }
+                            if (c == "\r" || c == "\n") break;
+                        }
+                        if (closePos == -1)
+                        {
+                            for (int k = range.Start; k <= Math.Min(range.End + 3, doc.Content.End); k++)
+                            {
+                                string c = doc.Range(k, k + 1).Text;
+                                if (c == ")" || c == "]") { closePos = k; break; }
+                            }
+                        }
+                        if (closePos == -1) continue;
+
+                        // ---- MOVE PUNCTUATION OUTSIDE CLOSING BRACKET ----
+                        doc.Range(closePos + 1, closePos + 1).InsertAfter(punc);
+                        moveCount++;
+                        modifiedBrackets.Add(bracketPos);
+                    }
+                    catch
+                    {
+                        // skip any single hyperlink error
+                    }
+                }
+
+                // ---- SPACE FIXES around modified bracket areas ----
+                foreach (int bracketPos in modifiedBrackets)
+                {
+                    int from = Math.Max(0, bracketPos - 40);
+                    Word.Range local = doc.Range(from, bracketPos + 1);
+                    Word.Find f = local.Find;
+                    f.ClearFormatting();
+                    f.Replacement.ClearFormatting();
+
+                    // collapse multiple spaces before opening bracket to single space
+                    f.Text = "[ ^s^t^32^160]{2,}([\\(\\[])";
+                    f.Replacement.Text = " \\1";
+                    f.MatchWildcards = true;
+                    object replaceAll = Word.WdReplace.wdReplaceAll;
+                    f.Execute(Replace: ref replaceAll);
+                    spaceFixCount++;
+                }
+
+                // ===== SAFE SAVE BLOCK =====
+                try
+                {
+                    // Skip save if document is new (like "Document1") or ReadOnly
+                    if (!doc.ReadOnly && !string.IsNullOrEmpty(doc.FullName) && !doc.FullName.Contains("Document"))
+                    {
+                        var oldAlerts = app.DisplayAlerts;
+                        app.DisplayAlerts = Word.WdAlertLevel.wdAlertsNone;
+
+                        try { doc.Save(); } catch { }
+
+                        app.DisplayAlerts = oldAlerts;
+                    }
+                }
+                catch { }
+
+
+                // Per your choice "C": no detailed counts; just a short toast
+                NotifyClient("Punctuation shift done.");
+
+                // restore UI
+                app.ScreenUpdating = true;
+            }
+            catch (Exception ex)
+            {
+                NotifyClient("Punctuation shift failed: " + ex.Message);
+            }
+        }
+
     }
 }

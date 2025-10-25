@@ -1,5 +1,5 @@
 /* ---- Base ---- */
-* {
+/** {
     box-sizing: border-box;
 }
 
@@ -26,10 +26,10 @@ body {
     font: 14px/1.35 "Segoe UI",system-ui,Arial;
     color: var(--text);
     background: var(--bg);
-}
+}*/
 
 /* ---- Shell ---- */
-.pe-shell {
+/*.pe-shell {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -67,10 +67,10 @@ body {
     .icon-btn:focus {
         outline: none;
         box-shadow: var(--focus);
-    }
+    }*/
 
 /* ---- Cards ---- */
-.pe-card {
+/*.pe-card {
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -139,16 +139,188 @@ body {
 
     .pe-btn-primary:hover {
         background: var(--brand-ink);
-    }
+    }*/
 
 /* ---- Status + Toast ---- */
-.pe-status {
+/*.pe-status {
     padding: 10px;
 }
 
 .pe-toast {
     position: fixed;
     inset: auto 16px 16px auto;
+    background: #111827;
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.15);
+    max-width: 260px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: .25s ease;
+}
+
+    .pe-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }*/
+/* Base */
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --line: #e6e8ec;
+    --brand: #2563eb;
+    --brand-ink: #1e40af;
+    --focus: 0 0 0 2px rgba(37,99,235,.25);
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font: 14px/1.35 "Segoe UI", Arial, system-ui;
+    color: var(--text);
+    background: var(--bg);
+}
+
+/* Wrapper (medium width feel retained by taskpane width) */
+.pe-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+}
+
+/* Header */
+.pe-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pe-brand {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.pe-icon {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 10px;
+    padding: 6px 8px;
+    cursor: pointer;
+}
+
+    .pe-icon:focus {
+        outline: none;
+        box-shadow: var(--focus);
+    }
+
+/* Divider */
+.pe-div {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 6px 0;
+}
+
+/* Sections */
+.pe-sec {
+    display: grid;
+    gap: 8px;
+}
+
+.pe-cap {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.pe-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Controls */
+.pe-input {
+    min-width: 210px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+
+    .pe-input:focus {
+        outline: none;
+        box-shadow: var(--focus);
+    }
+
+.pe-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #f3f4f6;
+    cursor: pointer;
+}
+
+    .pe-btn:hover:not(:disabled) {
+        background: #eef2f7;
+    }
+
+    .pe-btn:disabled {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    .pe-btn:focus {
+        outline: none;
+        box-shadow: var(--focus);
+    }
+
+.pe-btn-primary {
+    color: #fff;
+    background: var(--brand);
+    border-color: var(--brand);
+}
+
+    .pe-btn-primary:hover {
+        background: var(--brand-ink);
+    }
+
+/* Text */
+.pe-muted {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.pe-hint {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* Status */
+.pe-status {
+    padding: 10px 12px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+
+/* Toast */
+.pe-toast {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
     background: #111827;
     color: #fff;
     padding: 10px 12px;
