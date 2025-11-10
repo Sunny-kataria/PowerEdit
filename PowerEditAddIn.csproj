@@ -236,6 +236,9 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UtilityPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <EmbeddedResource Include="DesignerPane.resx">
       <DependentUpon>DesignerPane.cs</DependentUpon>
     </EmbeddedResource>
@@ -283,10 +286,16 @@
     <Content Include="ui\app.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ui\utility.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ui\index.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ui\style.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ui\utility.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

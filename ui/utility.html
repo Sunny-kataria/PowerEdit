@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>PowerEdit Utility</title>
+    <link rel="stylesheet" href="utility.css">
+</head>
+<body>
+    <header>⚙️ PowerEdit Utility</header>
+
+    <div id="accordionContainer">
+
+        <!-- Auto Structuring -->
+        <div class="accordion">
+            <div class="acc-header">Auto Structuring <span class="arrow">▶</span></div>
+            <div class="acc-body">
+                <ul>
+                    <li>Apply Heading Hierarchy</li>
+                    <li>Detect Paragraph Patterns</li>
+                    <li>Auto Number Headings</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Reference -->
+        <div class="accordion">
+            <div class="acc-header">Reference <span class="arrow">▶</span></div>
+            <div class="acc-body">
+                <ul>
+                    <li>Reference Marking & Validation</li>
+                    <li>Linked [Cited/Uncited] Information</li>
+                    <li>Fundref Linking</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Journal Title Restructuring -->
+        <div class="accordion">
+            <div class="acc-header">Journal Title Restructuring <span class="arrow">▶</span></div>
+            <div class="acc-body">
+                <ul>
+                    <li>Generate Header XML</li>
+                    <li>Author & Affiliation breakup</li>
+                    <li>APA 7th Edition Formatting</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.acc-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const body = header.nextElementSibling;
+                const arrow = header.querySelector('.arrow');
+                const open = body.classList.toggle('open');
+                arrow.classList.toggle('open', open);
+            });
+        });
+    </script>
+</body>
+</html>

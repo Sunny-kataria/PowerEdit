@@ -50,7 +50,7 @@
     <script src="app.js"></script>
 </body>
 </html>-->
-<!doctype html>
+<!--<!doctype html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -103,6 +103,74 @@
     </aside>
 
     <div id="toast" class="pe-toast" hidden></div>
+
+    <script src="app.js"></script>
+</body>
+</html>-->
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>PowerEdit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+    <!-- LEFT MAIN PANEL -->
+    <aside class="pe-wrap">
+        <header class="pe-head">
+            <div class="pe-brand">⚡ PowerEdit</div>
+            <button id="togglePin" class="pe-icon" title="Pin panel">📌</button>
+        </header>
+
+        <hr class="pe-div" />
+
+        <section class="pe-sec">
+            <div class="pe-cap">FILE</div>
+            <div class="pe-row">
+                <button id="browse" class="pe-btn pe-btn-primary">Browse…</button>
+                <span id="fileName" class="pe-muted">No file selected</span>
+            </div>
+            <div class="pe-hint">Selected file loads into the current document (center).</div>
+        </section>
+
+        <hr class="pe-div" />
+
+        <section class="pe-sec">
+            <div class="pe-cap">ACTIONS</div>
+            <div class="pe-row">
+                <select id="action" class="pe-input">
+                    <option value="">— Choose an action —</option>
+                    <option value="punctuation">1 — Punctuation shift</option>
+                    <option value="query">2 — Query inserted</option>
+                    <option value="doi">3 — DOI validation</option>
+                    <option value="url">4 — URL validation</option>
+                    <option value="preedit">5 — PreEditing</option>
+                    <option value="custom6">6 — Custom (reserved)</option>
+                </select>
+                <button id="run" class="pe-btn" disabled>Run</button>
+            </div>
+        </section>
+
+        <hr class="pe-div" />
+
+        <section class="pe-sec">
+            <div class="pe-cap">STATUS</div>
+            <div id="status" class="pe-status">Ready.</div>
+        </section>
+    </aside>
+
+    <!-- Toast Message -->
+    <div id="toast" class="pe-toast" hidden></div>
+
+    <!-- ✅ FIXED RIGHT UTILITY PANEL -->
+    <div id="utility-wrapper">
+        <div id="utility-handle">PowerEdit Utility</div>
+        <div id="utility-panel">
+            <iframe src="utility.html" id="utility-frame"></iframe>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
